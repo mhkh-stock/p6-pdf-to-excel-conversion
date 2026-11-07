@@ -20,7 +20,11 @@ BASE = Path(__file__).resolve().parents[1]
 RAW = BASE / "data" / "raw"
 DB = BASE / "data" / "processed" / "extracted.db"
 
-MONEY = re.compile(r"^\d{1,3}(,\d{3})*(\.\d{2})$")
+MONEY = re.compile(r"^\d{1,3}(,\d{3})*(\.\d{1,2})?$")
+# Decimal part is optional with 1–2 digits: real invoices print whole
+# rupees ("1,250") and one-decimal amounts ("1,250.5") as well as the
+# usual two-decimal form ("1,250.50"). The old pattern required exactly
+# two decimals, so those amounts silently failed to parse.
 INT = re.compile(r"^\d+$")
 INV_NO = re.compile(r"INV-\d{4}-\d{3}")
 DATE = re.compile(r"\d{2} [A-Z][a-z]{2} \d{4}")

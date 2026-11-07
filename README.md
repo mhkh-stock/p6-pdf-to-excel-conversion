@@ -1,5 +1,7 @@
 # P6 — PDF → Excel Conversion Pipeline
 
+**Repo:** https://github.com/mhkh-stock/p6-pdf-to-excel-conversion
+
 **Client pain:** invoices and reports arrive as PDFs; somebody re-types
 every line into Excel by hand — slow, and one mistyped zero ruins a
 month's accounts.
@@ -22,7 +24,7 @@ flowchart LR
     A[5 SAMPLE invoice PDFs<br/>data/raw/] --> B[PyMuPDF word-box<br/>extraction<br/>src/extract.py]
     B --> C[SQLite<br/>invoices + lines<br/>data/processed/extracted.db]
     C --> D[Excel workbook<br/>Lines + Invoices + Summary<br/>outputs/invoices_SAMPLE.xlsx]
-    D --> E[24 data-quality checks<br/>src/checks.py]
+    D --> E[25 data-quality checks<br/>src/checks.py]
 ```
 
 ## Business question it answers
@@ -40,8 +42,9 @@ flowchart LR
 | `src/make_sample_pdfs.py` | Generates the sample PDFs (fictional data) |
 | `src/extract.py` | The pipeline: word-box rows → line items + totals |
 | `src/build_excel.py` | Builds the workbook from the database |
-| `src/checks.py` | Data-quality checks as code — 24 checks, all passing |
+| `src/checks.py` | Data-quality checks as code — 25 checks, all passing |
 | `sql/schema.sql` | Database schema (`invoices` + `lines`) |
+| `screenshots/summary.png` | The Summary sheet rendered from the live workbook (LibreOffice, 7 Nov 2026): per-invoice line-sums vs PDF totals, all Match OK, grand total PKR 184,457.60 |
 
 ## 3 key findings (from this sample)
 
@@ -73,9 +76,9 @@ flowchart LR
 | Grand total (all invoices) | PKR 184,457.60 |
 | Largest invoice | INV-2026-004, PKR 44,958.00 |
 | Tax rate on PDFs | 18% sales tax, rounded per invoice |
-| Checks | 24 passing (`python3 src/checks.py`) |
+| Checks | 25 passing (`python3 src/checks.py`) |
 
-Verification: `python3 src/checks.py` (24 checks pass) plus an
+Verification: `python3 src/checks.py` (25 checks pass) plus an
 independent reopen of the workbook — 20 lines, first row matching
 the PDF exactly, Summary formulas intact.
 

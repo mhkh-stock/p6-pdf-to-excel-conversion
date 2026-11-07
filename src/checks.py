@@ -43,6 +43,20 @@ def main():
 
     check("workbook has 5 invoices", len(invoices) == 5, f"({len(invoices)})")
     check("workbook has 20 lines", len(lines) == 20, f"({len(lines)})")
+    # Regression for the MONEY-regex decimals fix (extract.py): whole-rupee
+    # and one-decimal amounts must parse, not just two-decimal ones.
+    import importlib.util
+    _spec = importlib.util.spec_from_file_location(
+        "p6_extract", BASE / "src" / "extract.py")
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    check("MONEY regex accepts whole / 1-decimal / 2-decimal amounts",
+          _mod.parse_money("1,250") == 1250.0
+          and _mod.parse_money("1,250.5") == 1250.5
+          and _mod.parse_money("1,250.50") == 1250.50
+          and _mod.parse_money("480") == 480.0
+          and _mod.parse_money("abc") is None
+          and _mod.parse_money("1,25.00") is None)
     check("every line amount = qty x unit price",
           all(abs(r[6] - r[4] * r[5]) < 0.005 for r in lines))
     check("no PAID-stamp text leaked into lines",
