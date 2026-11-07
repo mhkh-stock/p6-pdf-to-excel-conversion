@@ -60,7 +60,7 @@ def parse_pdf(path):
                 totals["subtotal"] = parse_money(toks[1])
             elif toks[0] == "TOTAL" and len(toks) == 2:
                 totals["total"] = parse_money(toks[1])
-            elif toks[0] == "Sales" and toks[1] == "Tax":
+            elif len(toks) >= 2 and toks[0] == "Sales" and toks[1] == "Tax":
                 totals["tax"] = parse_money(toks[-1])
             elif (len(toks) >= 4 and INT.match(toks[-3])
                     and parse_money(toks[-2]) is not None
@@ -71,9 +71,10 @@ def parse_pdf(path):
                     "unit_price": parse_money(toks[-2]),
                     "amount": parse_money(toks[-1]),
                 })
-    if not (inv_no and items and len(totals) == 3):
+    if not (inv_no and date and buyer and items and len(totals) == 3):
         raise ValueError(f"{path.name}: incomplete parse "
-                         f"(inv={inv_no}, items={len(items)}, totals={totals})")
+                         f"(inv={inv_no}, date={date}, buyer={buyer}, "
+                         f"items={len(items)}, totals={totals})")
     return {"invoice_no": inv_no, "date": date, "buyer": buyer,
             "items": items, **totals}
 

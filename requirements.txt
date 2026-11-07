@@ -1,3 +1,3 @@
-pymupdf>=1.24
-openpyxl>=3.1
-reportlab>=4.0  # sample PDFs only; not needed to convert client PDFs
+pymupdf==2.0
+openpyxl==3.1.2
+reportlab==5.0.1  # sample PDFs only; not needed to convert client PDFs

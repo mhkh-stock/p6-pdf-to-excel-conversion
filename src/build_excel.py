@@ -69,8 +69,9 @@ def main():
                   f"=COUNTIF(Lines!A:A,A{i})",
                   f"=SUMIF(Lines!A:A,A{i},Lines!G:G)",
                   row[5],
-                  f"=IF(ROUND(C{i}+ROUND(C{i}*0.18,2),2)=D{i},\"OK\",\"CHECK\")"])
-        # line-sum is the subtotal; PDF total = subtotal + rounded 18% tax
+                  f"=IF(ROUND(C{i}+VLOOKUP(A{i},Invoices!$A:$F,5,FALSE),2)=D{i},\"OK\",\"CHECK\")"])
+        # line-sum is the subtotal; PDF total = subtotal + the tax printed
+        # on that invoice (read from the PDF by the extractor, never assumed)
     n = len(invoices) + 1
     s.append(["GRAND TOTAL", f"=SUM(B2:B{n})", f"=SUM(C2:C{n})",
               f"=SUM(D2:D{n})", ""])
@@ -90,7 +91,8 @@ def main():
         "Lines sheet: every line item from every invoice, as extracted.",
         "Invoices sheet: subtotal / tax / total exactly as printed on each PDF.",
         "Summary sheet: line-sums are live SUMIF formulas; Match? checks",
-        "  line-sum x 1.18 against the PDF total (all must read OK).",
+        "  line-sum + the tax printed on that invoice against its PDF",
+        "  total (all must read OK).",
         "SAMPLE data: this workbook demonstrates the service. A real order",
         "  runs the same pipeline on the client's own PDFs.",
         "Re-run: python3 src/extract.py && python3 src/build_excel.py",

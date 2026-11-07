@@ -6,4 +6,28 @@
   ignores non-item text.
 - `data/processed/extracted.db` — SQLite store written by
   `src/extract.py`: `invoices` (5 rows) + `lines` (20 rows).
+  Schema: `sql/schema.sql`.
 - No real business data is involved anywhere in this project.
+
+## Data dictionary (`data/processed/extracted.db`)
+
+**`invoices`** — one row per PDF:
+
+| Column | Type | Meaning |
+|---|---|---|
+| invoice_no | TEXT (PK) | Invoice number as printed, e.g. INV-2026-001 |
+| date | TEXT | Invoice date as printed, e.g. 05 Oct 2026 |
+| buyer | TEXT | Buyer name + city as printed |
+| subtotal | REAL | Sum of line amounts, PKR, as printed |
+| tax | REAL | Sales tax, PKR, as printed |
+| total | REAL | Subtotal + tax, PKR, as printed |
+
+**`lines`** — one row per extracted line item:
+
+| Column | Type | Meaning |
+|---|---|---|
+| invoice_no | TEXT | Invoice this line belongs to |
+| description | TEXT | Item description as printed |
+| qty | INTEGER | Quantity |
+| unit_price | REAL | Unit price, PKR |
+| amount | REAL | qty × unit_price, PKR, as printed |

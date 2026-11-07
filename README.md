@@ -17,6 +17,14 @@ workbook, extracted by code, never re-typed. **Status: SAMPLE delivery**
 > the workbook is checked back against the PDF it came from. A real
 > order runs the same pipeline on the client's own PDFs.
 
+```mermaid
+flowchart LR
+    A[5 SAMPLE invoice PDFs<br/>data/raw/] --> B[PyMuPDF word-box<br/>extraction<br/>src/extract.py]
+    B --> C[SQLite<br/>invoices + lines<br/>data/processed/extracted.db]
+    C --> D[Excel workbook<br/>Lines + Invoices + Summary<br/>outputs/invoices_SAMPLE.xlsx]
+    D --> E[24 data-quality checks<br/>src/checks.py]
+```
+
 ## Business question it answers
 
 > "Turn this pile of invoice PDFs into a spreadsheet I can actually
@@ -33,6 +41,7 @@ workbook, extracted by code, never re-typed. **Status: SAMPLE delivery**
 | `src/extract.py` | The pipeline: word-box rows → line items + totals |
 | `src/build_excel.py` | Builds the workbook from the database |
 | `src/checks.py` | Data-quality checks as code — 24 checks, all passing |
+| `sql/schema.sql` | Database schema (`invoices` + `lines`) |
 
 ## 3 key findings (from this sample)
 
@@ -70,17 +79,30 @@ Verification: `python3 src/checks.py` (24 checks pass) plus an
 independent reopen of the workbook — 20 lines, first row matching
 the PDF exactly, Summary formulas intact.
 
-## How to run it (under 5 steps)
+## How to run it (5 steps)
 
 1. Open `outputs/invoices_SAMPLE.xlsx` — that is the deliverable.
 2. To regenerate the sample PDFs: `python3 src/make_sample_pdfs.py`.
 3. To convert: `python3 src/extract.py` (writes the database).
 4. To rebuild the sheet: `python3 src/build_excel.py`.
 5. To check the data: `python3 src/checks.py`.
-6. To reuse it for a real client: point `src/extract.py` at the
-   client's PDFs (same invoice shape) — the workbook builder and
-   the checks need no changes. For a different invoice layout, the
-   row-pattern rules in `extract.py` are the one place to adapt.
+
+To reuse it for a real client: point `src/extract.py` at the
+client's PDFs (same invoice shape) — the workbook builder and
+the checks need no changes. For a different invoice layout, the
+row-pattern rules in `src/extract.py` are the one place to adapt.
+
+## Limits
+
+- One invoice layout: the row-pattern rules in `src/extract.py`
+  are written for this invoice shape; a different layout is the
+  one place to adapt (see the reuse note above).
+- Text-layer PDFs only: scanned / image-only PDFs have no text
+  for PyMuPDF to read — OCR is a separate service, quoted on
+  seeing a sample page.
+- Tax is read from each PDF, never assumed: the extractor takes
+  the printed tax figure, and the Summary sheet reconciles
+  line-sum + printed tax against the printed total.
 
 ## Tools
 
